@@ -86,7 +86,7 @@ public class TiredExecutor {
     }
     public synchronized String getWorkerReport() {
         // TODO: return readable statistics for each worker
-        String status = "Workers Report:\n";
+        String status = "--- Worker Report ---\n";
         for (int i = 0; i < workers.length; i++) {
             status = status + "Worker #" + workers[i].getWorkerId() + 
                  " [Fatigue: " + workers[i].getFatigue() + 

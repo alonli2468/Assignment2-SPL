@@ -1,0 +1,13 @@
+{
+    "operator": "+",
+    "operands": [
+        {
+            "operator": "*",
+            "operands": [
+                { "operator": "+", "operands": [[[1]], [[1]]] },
+                [[2]]
+            ]
+        },
+        [[3]]
+    ]
+}
