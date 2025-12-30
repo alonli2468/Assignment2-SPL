@@ -8,10 +8,10 @@ public class Main {
     public static void main(String[] args) throws IOException {
       // TODO: main
       
-    String inputPath = "test5.json";
+    String inputPath = "test2.json";
     String outputPath = "output.json";
 
-    LinearAlgebraEngine lae = new LinearAlgebraEngine(8);
+    LinearAlgebraEngine lae = new LinearAlgebraEngine(4);
 
     System.out.println("Starting computation for: " + inputPath);
 

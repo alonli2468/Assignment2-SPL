@@ -14,6 +14,9 @@ public class TiredExecutor {
     
     public TiredExecutor(int numThreads) {
         // TODO
+        if (numThreads <= 0) {
+            throw new IllegalArgumentException("Illegal number of threads");
+        }
         workers = new TiredThread[numThreads];
         for (int i=0; i<numThreads; i++){
             workers[i] = new TiredThread(i, 0.5 + Math.random());
@@ -24,16 +27,29 @@ public class TiredExecutor {
 
     public void submit(Runnable task) {
         // TODO
+        if (task == null){
+            throw new IllegalArgumentException("Task is null");
+        }
+
         TiredThread worker;
         Runnable new_task;
         try {
             synchronized(idleMinHeap){
-                do{
-                    while (idleMinHeap.isEmpty()) {
-                        idleMinHeap.wait();
+                boolean anyAlive = false;
+                for (TiredThread w : workers) {
+                    if (w.isAlive()) {
+                        anyAlive = true;
+                        break;
                     }
-                    worker = idleMinHeap.poll();
-                } while (worker.isBusy());
+                }
+                if (!anyAlive) {
+                    throw new IllegalStateException("Executor has been shut down");
+                }
+
+                while (idleMinHeap.isEmpty()) {
+                    idleMinHeap.wait();
+                }
+                worker = idleMinHeap.poll();
                 final TiredThread finalWorker = worker; 
 
                 new_task = () -> {
@@ -72,7 +88,6 @@ public class TiredExecutor {
                 Thread.currentThread().interrupt();
             }
         }
-        
     }
 
     public void shutdown() throws InterruptedException {

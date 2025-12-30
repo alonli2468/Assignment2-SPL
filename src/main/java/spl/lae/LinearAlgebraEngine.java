@@ -21,6 +21,8 @@ public class LinearAlgebraEngine {
 
     public ComputationNode run(ComputationNode computationRoot) {
         // TODO: resolve computation tree step by step until final matrix is produced
+        if (computationRoot == null)
+            throw new IllegalArgumentException("The root is null");
         while (computationRoot.getNodeType() != ComputationNodeType.MATRIX) {
             ComputationNode currNode = computationRoot.findResolvable();
             if (currNode.getChildren().size() > 2) {
@@ -28,6 +30,11 @@ public class LinearAlgebraEngine {
             } else {
                 loadAndCompute(currNode);
             }
+        }
+        try{
+            executor.shutdown();
+        } catch(InterruptedException e){
+            Thread.currentThread().interrupt();
         }
         return computationRoot;
     }
@@ -42,42 +49,34 @@ public class LinearAlgebraEngine {
         if (nodeType == ComputationNodeType.MATRIX)
             throw new IllegalArgumentException("Can't compute matrix");
         if (nodeType == ComputationNodeType.ADD) {
-            //System.out.println("---------START ADD--------");
             if (childrenNum != 2) {
                 throw new IllegalArgumentException("Can't compute ADD");
             } 
             leftMatrix.loadRowMajor(node.getChildren().getFirst().getMatrix());
             rightMatrix.loadRowMajor(node.getChildren().getLast().getMatrix());
             executor.submitAll(createAddTasks());
-            //System.out.println("---------END ADD--------");
         }
         else if (nodeType == ComputationNodeType.MULTIPLY) {
-            //System.out.println("---------START MUL--------");
             if (childrenNum != 2) {
                 throw new IllegalArgumentException("Can't compute MULTIPLY");
             } 
             leftMatrix.loadRowMajor(node.getChildren().getFirst().getMatrix());
             rightMatrix.loadRowMajor(node.getChildren().getLast().getMatrix());
             executor.submitAll(createMultiplyTasks());
-            //System.out.println("---------END MUL--------");
         }
         else if (nodeType == ComputationNodeType.NEGATE) {
-            //System.out.println("---------START NEG--------");
             if (childrenNum != 1) {
                 throw new IllegalArgumentException("Can't compute NEGATE");
             } 
             leftMatrix.loadRowMajor(node.getChildren().getFirst().getMatrix());
             executor.submitAll(createNegateTasks());
-            //System.out.println("---------END NEG--------");
         }
         else {
-            //System.out.println("---------START TRAN--------");
             if (childrenNum != 1) {
                 throw new IllegalArgumentException("Can't compute TRANSPOSE");
             } 
             leftMatrix.loadRowMajor(node.getChildren().getFirst().getMatrix());
             executor.submitAll(createTransposeTasks());
-            //System.out.println("---------END TRAN--------");
         }
         node.resolve(leftMatrix.readRowMajor());
     }
@@ -139,11 +138,6 @@ public class LinearAlgebraEngine {
         if (executor == null)
             throw new IllegalArgumentException("Executor is null");
         String report = executor.getWorkerReport();
-        try{
-            executor.shutdown();
-        } catch(InterruptedException e){
-            Thread.currentThread().interrupt();
-        }
         return report;
     }
 }

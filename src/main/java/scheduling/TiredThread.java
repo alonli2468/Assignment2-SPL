@@ -57,9 +57,9 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
      */
     public void newTask(Runnable task) {
        // TODO
-        // if (!handoff.isEmpty())
-        //     throw new IllegalStateException(); 
-        // add throws Exception if full
+       if (!alive.get()) {
+            throw new IllegalStateException("Worker is not alive");
+        }
         handoff.add(task);
     }
 
@@ -70,7 +70,6 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
     public void shutdown() {
        // TODO
         try{
-            busy.set(true);
             handoff.put(POISON_PILL);
         } catch(InterruptedException e){
             TiredThread.currentThread().interrupt();
